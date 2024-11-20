@@ -154,11 +154,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break;
         case MIDI_CC2:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 2;
-                current_ltrm_alpha_oled       = 'W';
-                current_MIDI_ccNumber_char[0] = '0';
-                current_MIDI_ccNumber_char[1] = '2';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 2, 127); // Sends CC #14 on MIDI_CHANNEL with value 127
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 2, 0); // Sends CC #14 on MIDI_CHANNEL with value 0
             }
             return false;
             break;
@@ -274,124 +272,101 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break; // Fall through for unhandled keycodes
         case MIDI_CC14:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 14;
-                current_ltrm_alpha_oled       = 'D';
-                current_MIDI_ccNumber_char[0] = '1';
-                current_MIDI_ccNumber_char[1] = '4';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 14, 127); // Sends CC #14 on MIDI_CHANNEL with value 127
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 14, 0); // Sends CC #14 on MIDI_CHANNEL with value 0
             }
             return false;
             break;
         case MIDI_CC15:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 15;
-                current_ltrm_alpha_oled       = 'D';
-                current_MIDI_ccNumber_char[0] = '1';
-                current_MIDI_ccNumber_char[1] = '5';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 15, 127);
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 15, 0);
             }
             return false;
             break;
         case MIDI_CC16:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 16;
-                current_ltrm_alpha_oled       = 'D';
-                current_MIDI_ccNumber_char[0] = '1';
-                current_MIDI_ccNumber_char[1] = '6';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 16, 127);
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 16, 0);
             }
             return false;
             break;
         case MIDI_CC17:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 17;
-                current_ltrm_alpha_oled       = 'D';
-                current_MIDI_ccNumber_char[0] = '1';
-                current_MIDI_ccNumber_char[1] = '7';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 17, 127);
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 17, 0);
             }
             return false;
             break;
         case MIDI_CC18:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 18;
-                current_ltrm_alpha_oled       = 'D';
-                current_MIDI_ccNumber_char[0] = '1';
-                current_MIDI_ccNumber_char[1] = '8';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 18, 127);
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 18, 0);
             }
             return false;
             break;
         case MIDI_CC19:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 19;
-                current_ltrm_alpha_oled       = 'D';
-                current_MIDI_ccNumber_char[0] = '1';
-                current_MIDI_ccNumber_char[1] = '9';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 19, 127);
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 19, 0);
             }
             return false;
             break;
         case MIDI_CC20:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 20;
-                current_ltrm_alpha_oled       = 'D';
-                current_MIDI_ccNumber_char[0] = '2';
-                current_MIDI_ccNumber_char[1] = '0';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 20, 127);
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 20, 0);
             }
             return false;
+            break;
         case MIDI_CC21:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 21;
-                current_ltrm_alpha_oled       = 'D';
-                current_MIDI_ccNumber_char[0] = '2';
-                current_MIDI_ccNumber_char[1] = '1';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 21, 127);
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 21, 0);
             }
             return false;
             break;
         case MIDI_CC22:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 22;
-                current_ltrm_alpha_oled       = 'D';
-                current_MIDI_ccNumber_char[0] = '2';
-                current_MIDI_ccNumber_char[1] = '2';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 22, 127);
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 22, 0);
             }
             return false;
             break;
         case MIDI_CC23:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 23;
-                current_ltrm_alpha_oled       = 'D';
-                current_MIDI_ccNumber_char[0] = '2';
-                current_MIDI_ccNumber_char[1] = '3';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 23, 127);
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 23, 0);
             }
             return false;
             break;
         case MIDI_CC24:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 24;
-                current_ltrm_alpha_oled       = 'D';
-                current_MIDI_ccNumber_char[0] = '2';
-                current_MIDI_ccNumber_char[1] = '4';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 24, 127);
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 24, 0);
             }
             return false;
             break;
         case MIDI_CC25:
             if (record->event.pressed) {
-                current_MIDI_ccNumber         = 25;
-                current_ltrm_alpha_oled       = 'D';
-                current_MIDI_ccNumber_char[0] = '2';
-                current_MIDI_ccNumber_char[1] = '5';
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 25, 127);
             } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, 25, 0);
             }
             return false;
             break;
-		case CULL_MACRO_1:
+		case CULL_MACRO_1: //REJECT, MARK RED, AND 1 STAR PHOTO
 		    if (record->event.pressed) {
 		        tap_code(KC_1);
 		        tap_code(KC_6);
@@ -399,7 +374,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		        tap_code(KC_RGHT);
 		    }
 		    break;
-		case CULL_MACRO_2:
+		case CULL_MACRO_2: //UNPICK, MARK YELLOW, AND 3 STAR PHOTO
 		    if (record->event.pressed) {
 		        tap_code(KC_3);
 		        tap_code(KC_7);
@@ -407,7 +382,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		        tap_code(KC_RGHT);
 		    }
 		    break;
-		case CULL_MACRO_3:
+		case CULL_MACRO_3: //PICK, MARK GREEN, 5 STAR PHOTO
 		    if (record->event.pressed) {
 		        tap_code(KC_5);
 		        tap_code(KC_8);
@@ -415,7 +390,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		        tap_code(KC_RGHT);
 		    }
 		    break;
-		case CULL_MACRO_4:
+		case CULL_MACRO_4: //PICK, MARK GREEN, 5 STAR PHOTO, ADD TO QUICK COLLECTION (LR) or My Selections (Aftershoot)
 		    if (record->event.pressed) {
 		        tap_code(KC_5);
 		        tap_code(KC_9);
@@ -424,59 +399,59 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		        tap_code(KC_RGHT);
 		    }
 		    break;
-		case SHTCT_MACRO_1:
+		case SHTCT_MACRO_1: // Launch YOUTUBE MUSIC via PowerToys
 		    if (record->event.pressed) {
 		        register_code(KC_LCTL);
-		        tap_code(KC_0);
+		        tap_code(KC_KP_0);
 		        unregister_code(KC_LCTL);
 		    }
 		    break;
-		case SHTCT_MACRO_2:
+		case SHTCT_MACRO_2:  // Launch Aftershoot via PowerToys
 		    if (record->event.pressed) {
 		        register_code(KC_LCTL);
-		        tap_code(KC_1);
+		        tap_code(KC_KP_1);
 		        unregister_code(KC_LCTL);
 		    }
 		    break;
-		case SHTCT_MACRO_3:
+		case SHTCT_MACRO_3: // Launch LR Classic via PowerToys
 		    if (record->event.pressed) {
 		        register_code(KC_LCTL);
-		        tap_code(KC_2);
+		        tap_code(KC_KP_2);
 		        unregister_code(KC_LCTL);
 		    }
 		    break;
-		case SHTCT_MACRO_4:
+		case SHTCT_MACRO_4: // Launch Photoshop via PowerToys
 		    if (record->event.pressed) {
 		        register_code(KC_LCTL);
-		        tap_code(KC_3);
+		        tap_code(KC_KP_3);
 		        unregister_code(KC_LCTL);
 		    }
 		    break;
-		case SHTCT_MACRO_5:
+		case SHTCT_MACRO_5: // Launch Adobe DNG Converter via PowerToys
 		    if (record->event.pressed) {
 		        register_code(KC_LCTL);
-		        tap_code(KC_4);
+		        tap_code(KC_KP_4);
 		        unregister_code(KC_LCTL);
 		    }
 		    break;
-		case SHTCT_MACRO_6:
+		case SHTCT_MACRO_6:  // Launch Blitzit Task Organization via PowerToys
 		    if (record->event.pressed) {
 		        register_code(KC_LCTL);
-		        tap_code(KC_5);
+		        tap_code(KC_KP_5);
 		        unregister_code(KC_LCTL);
 		    }
 		    break;
-		case SHTCT_MACRO_7:
+		case SHTCT_MACRO_7: // Launch NaviUpgrade Admin via PowerToys
 		    if (record->event.pressed) {
 		        register_code(KC_LCTL);
-		        tap_code(KC_6);
+		        tap_code(KC_KP_6);
 		        unregister_code(KC_LCTL);
 		    }
 		    break;
-		case SHTCT_MACRO_8:
+		case SHTCT_MACRO_8: // Launch Custom Web Dashboard via PowerToys
 		    if (record->event.pressed) {
 		        register_code(KC_LCTL);
-		        tap_code(KC_7);
+		        tap_code(KC_KP_7);
 		        unregister_code(KC_LCTL);
 		    }
 		    break;
@@ -622,8 +597,23 @@ void oled_task_user(void) {
 // int16_t encoder_val = 64;
 // MIDI key handling
 bool encoder_update_user(uint8_t index, bool clockwise) {
-    if (index == 0) { // Assuming single encoder
+    if (index == 0) {
         switch (biton32(layer_state)) {
+            case _CULL:
+                if (clockwise) {
+                    tap_code(KC_RGHT);
+                } else {
+                    tap_code(KC_LEFT);
+                }
+                break;
+            case _PRST:
+                if (clockwise) {
+                    tap_code(KC_RGHT);
+
+                } else {
+                    tap_code(KC_LEFT);
+                }
+                break;
             case _LTRM:
                 if (clockwise) {
                     midi_send_cc(&midi_device, MIDI_CHANNEL, current_MIDI_ccNumber, 65);
@@ -631,7 +621,23 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
                     midi_send_cc(&midi_device, MIDI_CHANNEL, current_MIDI_ccNumber, 63);
                 }
                 break;
+            case _SHTCT:
+                if (clockwise) {
+                    tap_code(KC_VOLU);
 
+                } else {
+                    tap_code(KC_VOLD);
+                }
+                break;
+            // case _MIDI:
+            //     if (clockwise) {
+            //         encoder_val++;
+            //         midi_send_cc(&midi_device, 0, 1, encoder_val);
+            //     } else {
+            //         encoder_val--;
+            //         midi_send_cc(&midi_device, 0, 1, encoder_val);
+            //     }
+            //     break;
             default:
                 break;
         }
