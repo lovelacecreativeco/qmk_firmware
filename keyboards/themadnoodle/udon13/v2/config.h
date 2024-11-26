@@ -20,3 +20,4 @@
 
 #define NUM_ENCODERS 1
 #define NUM_DIRECTIONS 2
+#define DEBOUNCE 10

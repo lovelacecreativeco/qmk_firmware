@@ -1,6 +1,10 @@
 #include "midi.h"
 #include "quantum.h"
 #include "quantum_keycodes.h"
+static uint16_t copy_timer;
+static uint16_t sync_timer;
+static uint16_t tap_hold_timer;
+#define TAPPING_TERM 200
 
 extern MidiDevice midi_device;
 
@@ -69,6 +73,10 @@ enum midi_cc_keycodes_LTRM {
     SHTCT_MACRO_6,
     SHTCT_MACRO_7,
 	SHTCT_MACRO_8,
+	COPY_ACTION,
+	SYNC,
+	PASTE,
+	TAP_HOLD_CTRL_SHIFT_D
 };
 
 static char current_alpha_oled = '\0';
@@ -88,14 +96,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_LTRM] = LAYOUT(
         MIDI_CC2,                        // Encoder Button
         MIDI_CC3, MIDI_CC4, MIDI_CC5, MIDI_CC6,
-        MIDI_CC7, MIDI_CC8, MIDI_CC9, MIDI_CC10,
-        MIDI_CC11, MIDI_CC12, MIDI_CC13, L_CYC
+        COPY_ACTION, PASTE, TAP_HOLD_CTRL_SHIFT_D, SYNC,
+        KC_LEFT, KC_RGHT, KC_RGHT, L_CYC
     ),
     [_PRST] = LAYOUT(
         KC_SPACE,                        // Encoder Button
         MIDI_CC15, MIDI_CC16, MIDI_CC17, MIDI_CC18,
-        MIDI_CC19, MIDI_CC20, MIDI_CC21, MIDI_CC22,
-        MIDI_CC23, MIDI_CC24, MIDI_CC25, L_CYC
+        COPY_ACTION, PASTE, TAP_HOLD_CTRL_SHIFT_D, SYNC,
+        KC_LEFT, KC_RGHT, KC_RGHT, L_CYC
     ),
     [_SHTCT] = LAYOUT(
         KC_MUTE,                         // Encoder Button
@@ -139,21 +147,29 @@ void keyboard_post_init_user(void) {
 
 bool led_mode; // false for Blinking Mode, true for Static Mode
 
+bool midi_encoder_active = false; // Flag to track encoder behavior
+
 // MIDI key handling
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case MIDI_CC1:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 current_MIDI_ccNumber         = 1;
                 current_ltrm_alpha_oled       = 'Q';
                 current_MIDI_ccNumber_char[0] = '0';
                 current_MIDI_ccNumber_char[1] = '1';
-            } else {
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
             break;
         case MIDI_CC2:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 midi_send_cc(&midi_device, MIDI_CHANNEL, 2, 127); // Sends CC #14 on MIDI_CHANNEL with value 127
             } else {
                 midi_send_cc(&midi_device, MIDI_CHANNEL, 2, 0); // Sends CC #14 on MIDI_CHANNEL with value 0
@@ -162,111 +178,155 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break;
         case MIDI_CC3:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 current_MIDI_ccNumber         = 3;
                 current_ltrm_alpha_oled       = 'E';
                 current_MIDI_ccNumber_char[0] = '0';
                 current_MIDI_ccNumber_char[1] = '3';
-            } else {
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
             break;
         case MIDI_CC4:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 current_MIDI_ccNumber         = 4;
                 current_ltrm_alpha_oled       = 'R';
                 current_MIDI_ccNumber_char[0] = '0';
                 current_MIDI_ccNumber_char[1] = '4';
-            } else {
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
             break;
         case MIDI_CC5:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 current_MIDI_ccNumber         = 5;
                 current_ltrm_alpha_oled       = 'T';
                 current_MIDI_ccNumber_char[0] = '0';
                 current_MIDI_ccNumber_char[1] = '5';
-            } else {
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
             break;
         case MIDI_CC6:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 current_MIDI_ccNumber         = 6;
                 current_ltrm_alpha_oled       = 'Y';
                 current_MIDI_ccNumber_char[0] = '0';
                 current_MIDI_ccNumber_char[1] = '6';
-            } else {
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
             break;
         case MIDI_CC7:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 current_MIDI_ccNumber         = 7;
                 current_ltrm_alpha_oled       = 'U';
                 current_MIDI_ccNumber_char[0] = '0';
                 current_MIDI_ccNumber_char[1] = '7';
-            } else {
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
             break;
         case MIDI_CC8:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 current_MIDI_ccNumber         = 8;
                 current_ltrm_alpha_oled       = 'I';
                 current_MIDI_ccNumber_char[0] = '0';
                 current_MIDI_ccNumber_char[1] = '8';
-            } else {
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
             break;
         case MIDI_CC9:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 current_MIDI_ccNumber         = 9;
                 current_ltrm_alpha_oled       = 'O';
                 current_MIDI_ccNumber_char[0] = '0';
                 current_MIDI_ccNumber_char[1] = '9';
-            } else {
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
             break;
         case MIDI_CC10:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 current_MIDI_ccNumber         = 10;
                 current_ltrm_alpha_oled       = 'P';
                 current_MIDI_ccNumber_char[0] = '1';
                 current_MIDI_ccNumber_char[1] = '0';
-            } else {
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
             break;
         case MIDI_CC11:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 current_MIDI_ccNumber         = 11;
                 current_ltrm_alpha_oled       = 'A';
                 current_MIDI_ccNumber_char[0] = '1';
                 current_MIDI_ccNumber_char[1] = '1';
-            } else {
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
             break;
         case MIDI_CC12:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 current_MIDI_ccNumber         = 12;
                 current_ltrm_alpha_oled       = 'S';
                 current_MIDI_ccNumber_char[0] = '1';
                 current_MIDI_ccNumber_char[1] = '2';
-            } else {
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
             break;
         case MIDI_CC13:
             if (record->event.pressed) {
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
                 current_MIDI_ccNumber         = 13;
                 current_ltrm_alpha_oled       = 'D';
                 current_MIDI_ccNumber_char[0] = '1';
                 current_MIDI_ccNumber_char[1] = '3';
-            } else {
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
             break; // Fall through for unhandled keycodes
@@ -371,7 +431,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		        tap_code(KC_1);
 		        tap_code(KC_6);
 		        tap_code(KC_X);
-		        tap_code(KC_RGHT);
 		    }
 		    break;
 		case CULL_MACRO_2: //UNPICK, MARK YELLOW, AND 3 STAR PHOTO
@@ -379,7 +438,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		        tap_code(KC_3);
 		        tap_code(KC_7);
 		        tap_code(KC_U);
-		        tap_code(KC_RGHT);
 		    }
 		    break;
 		case CULL_MACRO_3: //PICK, MARK GREEN, 5 STAR PHOTO
@@ -387,7 +445,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		        tap_code(KC_5);
 		        tap_code(KC_8);
 		        tap_code(KC_P);
-		        tap_code(KC_RGHT);
 		    }
 		    break;
 		case CULL_MACRO_4: //PICK, MARK GREEN, 5 STAR PHOTO, ADD TO QUICK COLLECTION (LR) or My Selections (Aftershoot)
@@ -396,7 +453,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		        tap_code(KC_9);
 		        tap_code(KC_B);
 		        tap_code(KC_P);
-		        tap_code(KC_RGHT);
 		    }
 		    break;
 		case SHTCT_MACRO_1: // Launch YOUTUBE MUSIC via PowerToys
@@ -496,6 +552,79 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             } else {
             }
             return false; // Skip all further processing of this key
+        
+        case COPY_ACTION:
+            if (record->event.pressed) {
+                copy_timer = timer_read();
+            } else {
+                if (timer_elapsed(copy_timer) < TAPPING_TERM) {
+                    tap_code16(C(KC_C));
+                    wait_ms(200);
+                    tap_code(KC_ENT);
+                } else {
+                    tap_code16(C(KC_C));
+                }
+            }
+            return false;
+
+        case TAP_HOLD_CTRL_SHIFT_D:
+		    if (record->event.pressed) {
+		        // Start the timer when the key is pressed
+		        tap_hold_timer = timer_read();
+
+		        // Set the MIDI encoder active for holding behavior
+		        midi_encoder_active = true;
+		        current_MIDI_ccNumber = 8;
+		        current_ltrm_alpha_oled = 'I';
+		        current_MIDI_ccNumber_char[0] = '0';
+		        current_MIDI_ccNumber_char[1] = '8';
+		    } else {
+		        // Check elapsed time when the key is released
+		        if (timer_elapsed(tap_hold_timer) < TAPPING_TERM) {
+		            // Short press: Send CTRL + SHIFT + D
+		            register_code(KC_LCTL);
+		            register_code(KC_LSFT);
+		            tap_code(KC_D);
+		            unregister_code(KC_LSFT);
+		            unregister_code(KC_LCTL);
+		        }
+
+        // Reset MIDI encoder state when the key is released
+        midi_encoder_active = false;
+    }
+
+    // Handle "held" behavior for long press
+    if (record->event.pressed && timer_elapsed(tap_hold_timer) >= TAPPING_TERM) {
+        // Long hold: Activate MIDI_CC8 and enable MIDI encoder
+        midi_encoder_active = true;
+        current_MIDI_ccNumber = 8;
+        current_ltrm_alpha_oled = 'I';
+        current_MIDI_ccNumber_char[0] = '0';
+        current_MIDI_ccNumber_char[1] = '8';
+    }
+
+            return false; // Skip further processing
+
+        case PASTE:
+            if (record->event.pressed) {
+                SEND_STRING(SS_LCTL("v")); // Sends Ctrl + V
+            }
+            return false; // Skip further processing of this key
+
+        case SYNC:
+            if (record->event.pressed) {
+                sync_timer = timer_read();
+            } else {
+                if (timer_elapsed(sync_timer) < TAPPING_TERM) {
+                    tap_code16(C(S(KC_S)));
+                    wait_ms(200);
+                    tap_code(KC_ENT);
+                } else {
+                    tap_code16(C(S(KC_S)));
+                }
+            }
+            return false;
+
         case L_CYC:
             // Our logic will happen on presses, nothing is done on releases
             if (!record->event.pressed) {
@@ -558,6 +687,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 
+
 #ifdef OLED_DRIVER_ENABLE
 void oled_task_user(void) {
     static const char PROGMEM image[] = {0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F, 0x90, 0x91, 0x92, 0x93, 0x94, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4};
@@ -596,50 +726,50 @@ void oled_task_user(void) {
 // Encoder configuration
 // int16_t encoder_val = 64;
 // MIDI key handling
+
 bool encoder_update_user(uint8_t index, bool clockwise) {
-    if (index == 0) {
-        switch (biton32(layer_state)) {
-            case _CULL:
-                if (clockwise) {
-                    tap_code(KC_RGHT);
-                } else {
-                    tap_code(KC_LEFT);
-                }
-                break;
-            case _PRST:
-                if (clockwise) {
-                    tap_code(KC_RGHT);
-
-                } else {
-                    tap_code(KC_LEFT);
-                }
-                break;
-            case _LTRM:
-                if (clockwise) {
-                    midi_send_cc(&midi_device, MIDI_CHANNEL, current_MIDI_ccNumber, 65);
-                } else {
-                    midi_send_cc(&midi_device, MIDI_CHANNEL, current_MIDI_ccNumber, 63);
-                }
-                break;
-            case _SHTCT:
-                if (clockwise) {
-                    tap_code(KC_VOLU);
-
-                } else {
-                    tap_code(KC_VOLD);
-                }
-                break;
-            // case _MIDI:
-            //     if (clockwise) {
-            //         encoder_val++;
-            //         midi_send_cc(&midi_device, 0, 1, encoder_val);
-            //     } else {
-            //         encoder_val--;
-            //         midi_send_cc(&midi_device, 0, 1, encoder_val);
-            //     }
-            //     break;
-            default:
-                break;
+    if (index == 0) { // Ensure this is the correct encoder
+        if (midi_encoder_active) {
+            // MIDI CC Behavior
+            if (clockwise) {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, current_MIDI_ccNumber, 65);
+            } else {
+                midi_send_cc(&midi_device, MIDI_CHANNEL, current_MIDI_ccNumber, 63);
+            }
+        } else {
+            // Layer-Specific Encoder Behavior
+            switch (biton32(layer_state)) {
+                case _CULL:
+                    if (clockwise) {
+                        tap_code(KC_RGHT);
+                    } else {
+                        tap_code(KC_LEFT);
+                    }
+                    break;
+                case _PRST:
+                    if (clockwise) {
+                        tap_code(KC_RGHT);
+                    } else {
+                        tap_code(KC_LEFT);
+                    }
+                    break;
+                case _LTRM:
+                    if (clockwise) {
+                        tap_code(KC_RGHT);
+                    } else {
+                        tap_code(KC_LEFT);
+                    }
+                    break;
+                case _SHTCT:
+                    if (clockwise) {
+                        tap_code(KC_VOLU);
+                    } else {
+                        tap_code(KC_VOLD);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
     return false; // Return false to indicate no additional processing is needed
