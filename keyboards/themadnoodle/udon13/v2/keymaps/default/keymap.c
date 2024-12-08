@@ -29,7 +29,12 @@ enum {
 };
 
 void copy_action_finished(tap_dance_state_t *state, void *user_data) {
-    if (state->count == 1) {
+    if (state->pressed) {
+        // Hold: Send Ctrl+C
+        register_code(KC_LCTL);
+        tap_code(KC_C);
+        unregister_code(KC_LCTL);
+    } else if (state->count == 1) {
         // Single Tap: Send Ctrl+C and Enter
         register_code(KC_LCTL);
         tap_code(KC_C);
@@ -40,11 +45,6 @@ void copy_action_finished(tap_dance_state_t *state, void *user_data) {
         // Double Tap: Send Ctrl+V
         register_code(KC_LCTL);
         tap_code(KC_V);
-        unregister_code(KC_LCTL);
-    } else if (state->pressed) {
-        // Hold: Send Ctrl+C
-        register_code(KC_LCTL);
-        tap_code(KC_C);
         unregister_code(KC_LCTL);
     }
 }
