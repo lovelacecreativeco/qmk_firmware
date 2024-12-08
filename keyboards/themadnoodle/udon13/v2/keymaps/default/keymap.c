@@ -90,20 +90,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_CULL] = LAYOUT(
         KC_SPACE,                        // Encoder Button
         CULL_MACRO_1, CULL_MACRO_2, CULL_MACRO_3, CULL_MACRO_4,
-        SWITCH_G_L, KC_UP, KC_S, KC_A,
-        KC_LEFT, KC_DOWN, KC_RGHT, L_CYC
+        KC_UP, SWITCH_G_L, KC_S, KC_A,
+        KC_DOWN, TAP_HOLD_CTRL_SHIFT_D, SYNC, L_CYC
     ),
     [_LTRM] = LAYOUT(
         MIDI_CC2,                        // Encoder Button
         MIDI_CC3, MIDI_CC4, MIDI_CC5, MIDI_CC6,
-        COPY_ACTION, PASTE, TAP_HOLD_CTRL_SHIFT_D, SYNC,
-        KC_LEFT, KC_RGHT, KC_RGHT, L_CYC
+        MIDI_CC7, MIDI_CC8, MIDI_CC9, MIDI_CC10,
+        COPY_ACTION, TAP_HOLD_CTRL_SHIFT_D, SYNC, L_CYC
     ),
     [_PRST] = LAYOUT(
         KC_SPACE,                        // Encoder Button
+        MIDI_CC11, MIDI_CC12, MIDI_CC13, MIDI_CC14,
         MIDI_CC15, MIDI_CC16, MIDI_CC17, MIDI_CC18,
-        COPY_ACTION, PASTE, TAP_HOLD_CTRL_SHIFT_D, SYNC,
-        KC_LEFT, KC_RGHT, KC_RGHT, L_CYC
+        COPY_ACTION, TAP_HOLD_CTRL_SHIFT_D, SYNC, L_CYC
     ),
     [_SHTCT] = LAYOUT(
         KC_MUTE,                         // Encoder Button
@@ -332,44 +332,74 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break; // Fall through for unhandled keycodes
         case MIDI_CC14:
             if (record->event.pressed) {
-                midi_send_cc(&midi_device, MIDI_CHANNEL, 14, 127); // Sends CC #14 on MIDI_CHANNEL with value 127
-            } else {
-                midi_send_cc(&midi_device, MIDI_CHANNEL, 14, 0); // Sends CC #14 on MIDI_CHANNEL with value 0
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
+                current_MIDI_ccNumber         = 14;
+                current_ltrm_alpha_oled       = 'D';
+                current_MIDI_ccNumber_char[0] = '1';
+                current_MIDI_ccNumber_char[1] = '4';
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
-            break;
+            break; // Fall through for unhandled keycodes
         case MIDI_CC15:
             if (record->event.pressed) {
-                midi_send_cc(&midi_device, MIDI_CHANNEL, 15, 127);
-            } else {
-                midi_send_cc(&midi_device, MIDI_CHANNEL, 15, 0);
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
+                current_MIDI_ccNumber         = 15;
+                current_ltrm_alpha_oled       = 'D';
+                current_MIDI_ccNumber_char[0] = '1';
+                current_MIDI_ccNumber_char[1] = '5';
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
-            break;
+            break; // Fall through for unhandled keycodes
         case MIDI_CC16:
             if (record->event.pressed) {
-                midi_send_cc(&midi_device, MIDI_CHANNEL, 16, 127);
-            } else {
-                midi_send_cc(&midi_device, MIDI_CHANNEL, 16, 0);
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
+                current_MIDI_ccNumber         = 16;
+                current_ltrm_alpha_oled       = 'D';
+                current_MIDI_ccNumber_char[0] = '1';
+                current_MIDI_ccNumber_char[1] = '6';
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
-            break;
+            break; // Fall through for unhandled keycodes
         case MIDI_CC17:
             if (record->event.pressed) {
-                midi_send_cc(&midi_device, MIDI_CHANNEL, 17, 127);
-            } else {
-                midi_send_cc(&midi_device, MIDI_CHANNEL, 17, 0);
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
+                current_MIDI_ccNumber         = 17;
+                current_ltrm_alpha_oled       = 'D';
+                current_MIDI_ccNumber_char[0] = '1';
+                current_MIDI_ccNumber_char[1] = '7';
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
-            break;
+            break; // Fall through for unhandled keycodes
         case MIDI_CC18:
             if (record->event.pressed) {
-                midi_send_cc(&midi_device, MIDI_CHANNEL, 18, 127);
-            } else {
-                midi_send_cc(&midi_device, MIDI_CHANNEL, 18, 0);
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
+                current_MIDI_ccNumber         = 18;
+                current_ltrm_alpha_oled       = 'D';
+                current_MIDI_ccNumber_char[0] = '1';
+                current_MIDI_ccNumber_char[1] = '8';
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
-            break;
+            break; // Fall through for unhandled keycodes
         case MIDI_CC19:
             if (record->event.pressed) {
                 midi_send_cc(&midi_device, MIDI_CHANNEL, 19, 127);
@@ -553,19 +583,60 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false; // Skip all further processing of this key
         
-        case COPY_ACTION:
+        case COPY_ACTION: {
+            static uint16_t press_time = 0;    // Timer for press duration
+            static uint16_t last_tap_time = 0; // Timer for detecting double-tap
+            static bool is_double_tap = false; // Tracks if a double-tap was detected
+
             if (record->event.pressed) {
-                copy_timer = timer_read();
-            } else {
-                if (timer_elapsed(copy_timer) < TAPPING_TERM) {
-                    tap_code16(C(KC_C));
-                    wait_ms(200);
-                    tap_code(KC_ENT);
+                uint16_t current_time = timer_read();
+
+                // Check for double-tap
+                if (timer_elapsed(last_tap_time) < TAPPING_TERM) {
+                    is_double_tap = true; // Mark as a double-tap
                 } else {
-                    tap_code16(C(KC_C));
+                    is_double_tap = false; // Reset double-tap state
+                }
+
+                // Record press time
+                press_time = current_time;
+
+                // Always update last tap time
+                last_tap_time = current_time;
+            } else {
+                uint16_t release_time = timer_elapsed(press_time);
+
+                if (is_double_tap) {
+                    // Handle double-tap: Send Ctrl + V
+                    register_code(KC_LCTL);
+                    tap_code(KC_V);
+                    unregister_code(KC_LCTL);
+
+                    // Reset double-tap state
+                    is_double_tap = false;
+                } else if (release_time >= TAPPING_TERM) {
+                    // Handle long press: Send Ctrl + C
+                    register_code(KC_LCTL);
+                    tap_code(KC_C);
+                    unregister_code(KC_LCTL);
+                } else {
+                    // Handle short press: Send Ctrl + C + Enter
+                    wait_ms(TAPPING_TERM); // Ensure no second tap comes
+                    if (!is_double_tap) {
+                        register_code(KC_LCTL);
+                        tap_code(KC_C);
+                        unregister_code(KC_LCTL);
+                        wait_ms(200);
+                        tap_code(KC_ENT);
+                    }
                 }
             }
-            return false;
+
+            return false; // Skip further processing
+        }
+
+
+
 
         case TAP_HOLD_CTRL_SHIFT_D:
 		    if (record->event.pressed) {
