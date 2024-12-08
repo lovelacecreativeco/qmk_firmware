@@ -7,7 +7,7 @@ COMMAND_ENABLE = no         # Disable Command feature
 NKRO_ENABLE = yes           # Enable N-Key Rollover
 OLED_ENABLE = yes           # Enable OLED Support
 ENCODER_ENABLE = yes        # Enable Rotary Encoder Support
-TAP_DANCE_ENABLE = no       # Not needed for this keymap
+TAP_DANCE_ENABLE = yes       # Not needed for this keymap
 RGBLIGHT_ENABLE = yes
 # MIDI Configuration
 MIDI_ENABLE = yes           # Enable MIDI Features

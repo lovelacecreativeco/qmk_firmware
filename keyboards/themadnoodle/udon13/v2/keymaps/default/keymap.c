@@ -4,7 +4,6 @@
 static uint16_t copy_timer;
 static uint16_t sync_timer;
 static uint16_t tap_hold_timer;
-#define TAPPING_TERM 200
 
 extern MidiDevice midi_device;
 
@@ -23,6 +22,44 @@ extern MidiDevice midi_device;
     { k20, k21, k22, k23 }, \
     { k30, k31, k32, k33 }  \
 }
+
+// Tap Dance Enum
+enum {
+    TD_COPY_ACTION,
+};
+
+void copy_action_finished(tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1) {
+        // Single Tap: Send Ctrl+C and Enter
+        register_code(KC_LCTL);
+        tap_code(KC_C);
+        unregister_code(KC_LCTL);
+        wait_ms(200);
+        tap_code(KC_ENT);
+    } else if (state->count == 2) {
+        // Double Tap: Send Ctrl+V
+        register_code(KC_LCTL);
+        tap_code(KC_V);
+        unregister_code(KC_LCTL);
+    } else if (state->pressed) {
+        // Hold: Send Ctrl+C
+        register_code(KC_LCTL);
+        tap_code(KC_C);
+        unregister_code(KC_LCTL);
+    }
+}
+
+void copy_action_reset(tap_dance_state_t *state, void *user_data) {
+    // Reset logic (e.g., clean up held keys)
+    unregister_code(KC_LCTL);
+}
+
+// Tap Dance Action Definition
+tap_dance_action_t tap_dance_actions[] = {
+    [TD_COPY_ACTION] = ACTION_TAP_DANCE_FN_ADVANCED(
+        NULL, copy_action_finished, copy_action_reset
+    ),
+};
 
 // Define a single layer
 enum layers {
@@ -97,19 +134,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         MIDI_CC2,                        // Encoder Button
         MIDI_CC3, MIDI_CC4, MIDI_CC5, MIDI_CC6,
         MIDI_CC7, MIDI_CC8, MIDI_CC9, MIDI_CC10,
-        COPY_ACTION, TAP_HOLD_CTRL_SHIFT_D, SYNC, L_CYC
+        TD(TD_COPY_ACTION), TAP_HOLD_CTRL_SHIFT_D, SYNC, KC_TRNS
     ),
     [_PRST] = LAYOUT(
         KC_SPACE,                        // Encoder Button
         MIDI_CC11, MIDI_CC12, MIDI_CC13, MIDI_CC14,
         MIDI_CC15, MIDI_CC16, MIDI_CC17, MIDI_CC18,
-        COPY_ACTION, TAP_HOLD_CTRL_SHIFT_D, SYNC, L_CYC
+        TD(TD_COPY_ACTION), TAP_HOLD_CTRL_SHIFT_D, SYNC, KC_TRNS
     ),
     [_SHTCT] = LAYOUT(
         KC_MUTE,                         // Encoder Button
         SHTCT_MACRO_1, KC_MPLY, KC_MPRV, KC_MNXT,
         SHTCT_MACRO_2, SHTCT_MACRO_3, SHTCT_MACRO_4, SHTCT_MACRO_5,
-        SHTCT_MACRO_6, SHTCT_MACRO_7, SHTCT_MACRO_8, L_CYC
+        TD(TD_COPY_ACTION), SHTCT_MACRO_7, SHTCT_MACRO_8, KC_TRNS
     ),
 };
 
@@ -148,6 +185,8 @@ void keyboard_post_init_user(void) {
 bool led_mode; // false for Blinking Mode, true for Static Mode
 
 bool midi_encoder_active = false; // Flag to track encoder behavior
+
+bool encoder_layer_cycling = false;
 
 // MIDI key handling
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -635,9 +674,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false; // Skip further processing
         }
 
-
-
-
         case TAP_HOLD_CTRL_SHIFT_D:
 		    if (record->event.pressed) {
 		        // Start the timer when the key is pressed
@@ -708,15 +744,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             // Check if we are within the range, if not quit
             if (current_layer > LAYER_CYCLE_END || current_layer < LAYER_CYCLE_START) {
                 return false;
-            }
-
+        }
             uint8_t next_layer = current_layer + 1;
-            if (next_layer > LAYER_CYCLE_END) {
-                next_layer = LAYER_CYCLE_START;
-            }
-            layer_move(next_layer);
-            return false;
-
+                if (next_layer > LAYER_CYCLE_END) {
+                    next_layer = LAYER_CYCLE_START;
+                }
+                layer_move(next_layer);
+                return false;
+        
         default:
             return true; // Process all other keycodes normally
     }
@@ -807,6 +842,27 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
             } else {
                 midi_send_cc(&midi_device, MIDI_CHANNEL, current_MIDI_ccNumber, 63);
             }
+        } else if (encoder_layer_cycling) {
+            // Layer Cycling Behavior when L_CYC is held
+            uint8_t current_layer = get_highest_layer(layer_state);
+            uint8_t target_layer;
+
+            if (clockwise) {
+                target_layer = current_layer + 1;
+                if (target_layer > LAYER_CYCLE_END) {
+                    target_layer = LAYER_CYCLE_START; // Wrap around to the first layer
+                }
+            } else {
+                target_layer = current_layer - 1;
+                if (target_layer < LAYER_CYCLE_START) {
+                    target_layer = LAYER_CYCLE_END; // Wrap around to the last layer
+                }
+            }
+
+            layer_move(target_layer);
+
+            // Reset encoder_layer_cycling after one turn
+            encoder_layer_cycling = false;
         } else {
             // Layer-Specific Encoder Behavior
             switch (biton32(layer_state)) {
