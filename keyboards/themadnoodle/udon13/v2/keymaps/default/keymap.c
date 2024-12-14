@@ -138,8 +138,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [_PRST] = LAYOUT(
         KC_SPACE,                        // Encoder Button
-        MIDI_CC11, MIDI_CC12, MIDI_CC13, MIDI_CC14,
-        MIDI_CC15, MIDI_CC16, MIDI_CC17, MIDI_CC18,
+        MIDI_CC12, MIDI_CC13, MIDI_CC14, MIDI_CC15,
+        MIDI_CC16, MIDI_CC17, MIDI_CC18, MIDI_CC19,
         TD(TD_COPY_ACTION), TAP_HOLD_CTRL_SHIFT_D, SYNC, KC_TRNS
     ),
     [_SHTCT] = LAYOUT(
@@ -441,12 +441,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break; // Fall through for unhandled keycodes
         case MIDI_CC19:
             if (record->event.pressed) {
-                midi_send_cc(&midi_device, MIDI_CHANNEL, 19, 127);
-            } else {
-                midi_send_cc(&midi_device, MIDI_CHANNEL, 19, 0);
+                // Set encoder to control MIDI_CC8
+                midi_encoder_active = true;
+                current_MIDI_ccNumber         = 19;
+                current_ltrm_alpha_oled       = 'D';
+                current_MIDI_ccNumber_char[0] = '1';
+                current_MIDI_ccNumber_char[1] = '9';
+             } else {
+                // Revert encoder to default behavior on release
+                midi_encoder_active = false;
             }
             return false;
-            break;
+            break; // Fall through for unhandled keycodes
         case MIDI_CC20:
             if (record->event.pressed) {
                 midi_send_cc(&midi_device, MIDI_CHANNEL, 20, 127);
@@ -675,26 +681,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
 
         case TAP_HOLD_CTRL_SHIFT_D:
-		    if (record->event.pressed) {
-		        // Start the timer when the key is pressed
-		        tap_hold_timer = timer_read();
-
-		        // Set the MIDI encoder active for holding behavior
-		        midi_encoder_active = true;
-		        current_MIDI_ccNumber = 8;
-		        current_ltrm_alpha_oled = 'I';
-		        current_MIDI_ccNumber_char[0] = '0';
-		        current_MIDI_ccNumber_char[1] = '8';
-		    } else {
-		        // Check elapsed time when the key is released
-		        if (timer_elapsed(tap_hold_timer) < TAPPING_TERM) {
-		            // Short press: Send CTRL + SHIFT + D
-		            register_code(KC_LCTL);
-		            register_code(KC_LSFT);
-		            tap_code(KC_D);
-		            unregister_code(KC_LSFT);
-		            unregister_code(KC_LCTL);
-		        }
+            if (record->event.pressed) {
+                // Start the timer when the key is pressed
+                tap_hold_timer = timer_read();
+                // Set the MIDI encoder active for holding behavior
+                midi_encoder_active = true;
+                current_MIDI_ccNumber = 11;
+                current_ltrm_alpha_oled = 'I';
+                current_MIDI_ccNumber_char[0] = '1';
+                current_MIDI_ccNumber_char[1] = '1';
+            } else {
+                // Check elapsed time when the key is released
+                if (timer_elapsed(tap_hold_timer) < TAPPING_TERM) {
+                    // Short press: Send CTRL + SHIFT + D
+                    register_code(KC_LCTL);
+                    register_code(KC_LSFT);
+                    tap_code(KC_D);
+                    unregister_code(KC_LSFT);
+                    unregister_code(KC_LCTL);
+                }
 
         // Reset MIDI encoder state when the key is released
         midi_encoder_active = false;
