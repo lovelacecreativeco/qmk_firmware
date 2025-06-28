@@ -506,6 +506,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		        tap_code(KC_1);
 		        tap_code(KC_6);
 		        tap_code(KC_X);
+                tap_code(KC_RGHT);
 		    }
 		    break;
 		case CULL_MACRO_2: //UNPICK, MARK YELLOW, AND 3 STAR PHOTO
@@ -513,6 +514,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		        tap_code(KC_3);
 		        tap_code(KC_7);
 		        tap_code(KC_U);
+                tap_code(KC_RGHT);
 		    }
 		    break;
 		case CULL_MACRO_3: //PICK, MARK GREEN, 5 STAR PHOTO
@@ -520,6 +522,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		        tap_code(KC_5);
 		        tap_code(KC_8);
 		        tap_code(KC_P);
+                tap_code(KC_RGHT);
 		    }
 		    break;
 		case CULL_MACRO_4: //PICK, MARK GREEN, 5 STAR PHOTO, ADD TO QUICK COLLECTION (LR) or My Selections (Aftershoot)
@@ -528,6 +531,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 		        tap_code(KC_9);
 		        tap_code(KC_B);
 		        tap_code(KC_P);
+                tap_code(KC_RGHT);
 		    }
 		    break;
 		case SHTCT_MACRO_1: // Launch YOUTUBE MUSIC via PowerToys
